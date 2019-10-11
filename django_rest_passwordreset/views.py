@@ -58,7 +58,7 @@ class ResetPasswordValidateToken(GenericAPIView):
             # delete expired token
             reset_password_token.delete()
             return Response({'status': 'expired'}, status=status.HTTP_404_NOT_FOUND)
-        
+
         return Response({'status': 'OK'})
 
 
@@ -95,7 +95,8 @@ class ResetPasswordConfirm(GenericAPIView):
 
         # change users password (if we got to this code it means that the user is_active)
         if reset_password_token.user.eligible_for_reset():
-            pre_password_reset.send(sender=self.__class__, user=reset_password_token.user)
+            pre_password_reset.send(
+                sender=self.__class__, user=reset_password_token.user, raw_password=password)
             try:
                 # validate the password against existing validators
                 validate_password(
@@ -111,7 +112,8 @@ class ResetPasswordConfirm(GenericAPIView):
 
             reset_password_token.user.set_password(password)
             reset_password_token.user.save()
-            post_password_reset.send(sender=self.__class__, user=reset_password_token.user)
+            post_password_reset.send(
+                sender=self.__class__, user=reset_password_token.user, raw_password=password)
 
         # Delete all password reset tokens for this user
         ResetPasswordToken.objects.filter(user=reset_password_token.user).delete()
