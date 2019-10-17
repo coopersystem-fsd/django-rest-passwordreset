@@ -10,6 +10,6 @@ reset_password_token_created = django.dispatch.Signal(
     providing_args=["instance", "reset_password_token"],
 )
 
-pre_password_reset = django.dispatch.Signal(providing_args=["user"])
+pre_password_reset = django.dispatch.Signal(providing_args=["user", "raw_password"])
 
-post_password_reset = django.dispatch.Signal(providing_args=["user"])
+post_password_reset = django.dispatch.Signal(providing_args=["user", "raw_password"])
